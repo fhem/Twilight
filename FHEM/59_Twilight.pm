@@ -1,34 +1,35 @@
 # $Id$
 ##############################################################################
 #
-#     59_Twilight.pm
-#     Copyright by Sebastian Stuecker
-#     erweitert von Dietmar Ortmann
-#     Maintained by igami since 02-2018
+#   59_Twilight.pm
 #
-#     used algorithm see:          http://lexikon.astronomie.info/zeitgleichung/
+#   Copyright by
+#       Sebastian Stuecker
+#       Dietmar Ortmann
+#       Christoph Morrison, jeschkec <fhem@christoph-jeschke.de>
 #
-#     Sun position computing
-#     Copyright (C) 2013 Julian Pawlowski, julian.pawlowski AT gmail DOT com
-#     based on Twilight.tcl  http://www.homematic-wiki.info/mw/index.php/TCLScript:twilight
-#     With contribution from http://www.ip-symcon.de/forum/threads/14925-Sonnenstand-berechnen-(Azimut-amp-Elevation)
+#   used algorithm see:          http://lexikon.astronomie.info/zeitgleichung/
 #
-#     e-mail: omega at online dot de
+#   Sun position computing
+#   Copyright (C) 2013 Julian Pawlowski, julian.pawlowski AT gmail DOT com
+#   based on Twilight.tcl  http://www.homematic-wiki.info/mw/index.php/TCLScript:twilight
+#   With contribution from http://www.ip-symcon.de/forum/threads/14925-Sonnenstand-berechnen-(Azimut-amp-Elevation)
 #
-#     This file is part of fhem.
+#   This file is part of FHEM.
 #
-#     Fhem is free software: you can redistribute it and/or modify
-#     it under the terms of the GNU General Public License as published by
-#     the Free Software Foundation, either version 2 of the License, or
-#     (at your option) any later version.
+#   This program is free software; you can redistribute it and/or modify it under
+#   the terms of  the GNU General Public License as published by the Free Software
+#   Foundation; either version 2 of the License, or  (at your option) any later
+#   version.
 #
-#     Fhem is distributed in the hope that it will be useful,
-#     but WITHOUT ANY WARRANTY; without even the implied warranty of
-#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#     GNU General Public License for more details.
+#   This program is distributed in the hope that it will be useful, but WITHOUT
+#   ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+#   FOR A PARTICULAR PURPOSE. See the GNU General Public License
+#   for more details.
 #
-#     You should have received a copy of the GNU General Public License
-#     along with fhem.  If not, see <http://www.gnu.org/licenses/>.
+#   You should have received a copy of the GNU General Public License along with
+#   this program; if not, write to the Free Software Foundation, Inc., 51 Franklin St,
+#   Fifth Floor, Boston, MA 02110, USA
 #
 ##############################################################################
 
