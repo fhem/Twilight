@@ -176,22 +176,51 @@ sub Get() {
 
 sub Attr() {
     my ($command, $device_name, $attribute_name, $attribute_value) = @_;
-    my $hash = $::defs{$device_name};
 
     given ($command) {
         when ('set') {
             given ($attribute_name) {
                 when ('useExtWeather') {
+
                     ::Log3($device_name, 3, "useExtWeather is deprecated, use Twilight_Weather instead.");
                     Attr($command, $device_name, 'Twilight_Weather', $attribute_value);
+
                 }
 
                 when ('Twilight_Weather') {
 
+                    my ($device, $reading) = _checkDeviceReading($attribute_value);
+
+                    return "${attribute_value} is no valid value for ${attribute_name}."
+                        unless ($device or $reading);
+
+                    return "${device} does not exist, but given for Twilight_Weather"
+                        unless defined $::defs{$device};
+
+                    return "${reading} does not exist for device ${device}, but given for Twilight_Weather"
+                        unless defined $::defs{$device}{READINGS}{$reading};
+
+                    $Twilight->{'.Twilight_Weather'} = $attribute_value;
                 }
 
                 when ('Twilight_Forecast') {
 
+                    my ($device, $reading) = _checkDeviceReading($attribute_value);
+
+                    return "${attribute_value} is no valid value for ${attribute_name}."
+                        unless ($device or $reading);
+
+                    return "${device} does not exist, but given for Twilight_Forecast"
+                        unless defined $::defs{$device};
+
+                    return "${reading} does not exist for device ${device}, but given for Twilight_Forecast"
+                        unless defined $::defs{$device}{READINGS}{$reading};
+
+                    $Twilight->{'.Twilight_Forecast'} = $attribute_value;
+                }
+
+                default {
+                    return "Tried to add unknown attribute $attribute_name.";
                 }
             }
         }
@@ -204,11 +233,17 @@ sub Attr() {
                 }
 
                 when ('Twilight_Weather') {
-
+                    delete $Twilight->{'.Twilight_Weather'};
+                    # @todo Update the calculations
                 }
 
                 when ('Twilight_Forecast') {
+                    delete $Twilight->{'.Twilight_Forecast'};
+                    # @todo Update the calculations
+                }
 
+                default {
+                    return "Tried to delete unknown attribute $attribute_name.";
                 }
             }
         }
@@ -1165,73 +1200,6 @@ sub Twilight_sunpos($) {
     Twilight_sunposTimerSet($hash);
 
     return undef;
-}
-################################################################################
-sub Twilight_CompassPoint($) {
-    my ($azimuth) = @_;
-
-    my $compassPoint = "unknown";
-
-    if ( $azimuth < 22.5 ) {
-        $compassPoint = "north";
-    }
-    elsif ( $azimuth < 45 ) {
-        $compassPoint = "north-northeast";
-    }
-    elsif ( $azimuth < 67.5 ) {
-        $compassPoint = "northeast";
-    }
-    elsif ( $azimuth < 90 ) {
-        $compassPoint = "east-northeast";
-    }
-    elsif ( $azimuth < 112.5 ) {
-        $compassPoint = "east";
-    }
-    elsif ( $azimuth < 135 ) {
-        $compassPoint = "east-southeast";
-    }
-    elsif ( $azimuth < 157.5 ) {
-        $compassPoint = "southeast";
-    }
-    elsif ( $azimuth < 180 ) {
-        $compassPoint = "south-southeast";
-    }
-    elsif ( $azimuth < 202.5 ) {
-        $compassPoint = "south";
-    }
-    elsif ( $azimuth < 225 ) {
-        $compassPoint = "south-southwest";
-    }
-    elsif ( $azimuth < 247.5 ) {
-        $compassPoint = "southwest";
-    }
-    elsif ( $azimuth < 270 ) {
-        $compassPoint = "west-southwest";
-    }
-    elsif ( $azimuth < 292.5 ) {
-        $compassPoint = "west";
-    }
-    elsif ( $azimuth < 315 ) {
-        $compassPoint = "west-northwest";
-    }
-    elsif ( $azimuth < 337.5 ) {
-        $compassPoint = "northwest";
-    }
-    elsif ( $azimuth <= 361 ) {
-        $compassPoint = "north-northwest";
-    }
-    return $compassPoint;
-}
-
-sub twilight($$$$) {
-    my ( $twilight, $reading, $min, $max ) = @_;
-
-    my $t = hms2h( ReadingsVal( $twilight, $reading, 0 ) );
-
-    $t = hms2h($min) if ( defined($min) && ( hms2h($min) > $t ) );
-    $t = hms2h($max) if ( defined($max) && ( hms2h($max) < $t ) );
-
-    return h2hms_fmt($t);
 }
 
 1;
