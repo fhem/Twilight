@@ -304,7 +304,9 @@ sub CalcCompassPoint($) {
 
 package main;
 
-=head1 FHEM INIT FUNCTION
+=head1 Twilight_Initialize
+
+FHEM I<DefFn>
 
 =head2 Twilight_Initialize($)
 
@@ -312,7 +314,7 @@ FHEM I<Initialize> function
 
 =over
 
-=item * param hash: hash for the Ovulation_Calendar device
+=item * param $hash: hash for the Twilight device
 
 =back
 
