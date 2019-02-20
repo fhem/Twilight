@@ -174,8 +174,45 @@ sub Get($$) {
 
 }
 
-sub Attr($$) {
+sub Attr(@) {
+    my ($command, $device_name, $attribute_name, $attribute_value) = @_;
+    my $hash = $::defs{$device_name};
 
+    given ($command) {
+        when ('set') {
+            given ($attribute_name) {
+                when ('useExtWeather') {
+                    ::Log3($device_name, 3, "useExtWeather is deprecated, use Twilight_Weather instead.");
+                    Attr($command, $device_name, 'Twilight_Weather', $attribute_value);
+                }
+
+                when ('Twilight_Weather') {
+
+                }
+
+                when ('Twilight_Forecast') {
+
+                }
+            }
+        }
+
+        when ('del') {
+            given ($attribute_name) {
+                when ('useExtWeather') {
+                    ::Log3($device_name, 3, "useExtWeather is deprecated, use Twilight_Weather instead.");
+                    Attr($command, $device_name, 'Twilight_Weather');
+                }
+
+                when ('Twilight_Weather') {
+
+                }
+
+                when ('Twilight_Forecast') {
+
+                }
+            }
+        }
+    }
 }
 
 sub Notify($$) {
@@ -372,7 +409,12 @@ sub Twilight_Initialize($)
     $hash->{AttrFn}     =   "Twilight::Attr";
     $hash->{NotifyFn}   =   "Twilight::Notify";
     $hash->{AttrList}   =   join(' ',
-        ('useExtWeather'. 'debug')
+        (
+            'useExtWeather',
+            'Twilight_Weather',
+            'Twilight_Forecast',
+            'debug'
+        )
     ) . " $readingFnAttributes";
 }
 
