@@ -3,9 +3,13 @@
 #
 #   59_Twilight.pm
 #
+#   ---------------------------------------------------------------------------
+#
 #   Copyright by
+#
+#       Dietmar Ortmann, dietmar63
 #       Sebastian Stuecker
-#       Dietmar Ortmann
+#       Michael Prange, igami
 #       Christoph Morrison, jeschkec <fhem@christoph-jeschke.de>
 #
 #   used algorithm see:          http://lexikon.astronomie.info/zeitgleichung/
@@ -30,6 +34,11 @@
 #   You should have received a copy of the GNU General Public License along with
 #   this program; if not, write to the Free Software Foundation, Inc., 51 Franklin St,
 #   Fifth Floor, Boston, MA 02110, USA
+#
+#   ---------------------------------------------------------------------------
+#
+#   In memoriam Dietmar Ortmann, dietmar63
+#       * 19.07.1963  ✝ 11.07.2017
 #
 ##############################################################################
 
