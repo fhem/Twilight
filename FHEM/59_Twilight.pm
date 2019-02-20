@@ -298,7 +298,39 @@ sub CalcCompassPoint($) {
     }
 }
 
+=head2 _checkDeviceReading($)
 
+Checks a string for a Device:Reading combination
+
+=over
+
+=item Parameter
+
+$data   String to check
+
+=item Return Values
+
+Returns undef if $data does not match Device:Reading, returns 1 in scalar context if it does and
+a list consisting of {Device, Reading} if called in list context
+
+=back
+
+=cut
+
+sub _checkDeviceReading($) {
+
+    return unless defined wantarray;
+
+    my ($data) = shift;
+
+    return undef unless $data =~ m/(.*):(.*)/;
+
+    my ($device_name, $reading_name) = ($1, $2);
+
+    return wantarray
+        ? ($device_name, $reading_name)
+        : 1;
+}
 
 1;
 
