@@ -268,6 +268,38 @@ sub Midnight() {
 
 }
 
+sub CalcCompassPoint($) {
+
+    my ($azimuth) = @_;
+
+    $azimuth = 0 if ($azimuth > 360);
+
+    my %compass = (
+        22.5    =>  'north',
+        45      =>  'north-northeast',
+        67.5    =>  'northeast',
+        90      =>  'east-northeast',
+        112.5   =>  'east',
+        135     =>  'east-southeast',
+        157.5   =>  'southeast',
+        180     =>  'south-southeast',
+        202.5   =>  'south',
+        225     =>  'south-southwest',
+        247.5   =>  'southwest',
+        270     =>  'west-southwest',
+        292.5   =>  'west',
+        315     =>  'west-northwest',
+        337.5   =>  'northwest',
+        360     =>  'north-northwest'
+    );
+
+    foreach my $direction (sort { $a <=> $b } keys %compass) {
+        return $compass{$direction} if $azimuth < $direction;
+    }
+}
+
+
+
 1;
 
 package main;
