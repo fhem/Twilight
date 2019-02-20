@@ -333,6 +333,31 @@ sub Twilight_Initialize($)
     ) . " $readingFnAttributes";
 }
 
+=pod
+    twilight()
+
+    Implements a routine to compute the twilight times like sunrise or sunset with minimal and maximal time values.
+
+    Params:
+        $twilight   Name of the twilight device
+        $reading    Name of the reading to read, e.g. ss_astro
+        $min        Minimal time returned
+        $max        Maximal time returned
+
+    Returns:
+        Time asked for by $reading, formatted HH:MM:SS
+=cut
+sub twilight($$$$) {
+    my ( $twilight, $reading, $min, $max ) = @_;
+
+    my $t = hms2h( ReadingsVal( $twilight, $reading, 0 ) );
+
+    $t = hms2h($min) if ( defined($min) && ( hms2h($min) > $t ) );
+    $t = hms2h($max) if ( defined($max) && ( hms2h($max) < $t ) );
+
+    return h2hms_fmt($t);
+}
+
 __END__
 
 =pod
