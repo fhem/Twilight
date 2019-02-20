@@ -64,12 +64,12 @@ our $Twilight;
 our $rad = 180./pi;
 our $time_delta = 65;
 
-sub Debug(@) {
+sub Debug() {
     $OFS = ", ";
     ::Debug("@_") if ::AttrVal("global", "verbose", undef) eq "5";
 }
 
-sub Define($$) {
+sub Define() {
     my ( $hash, $device_definition ) = @_;
     my @definition_arguments = split( "[ \t][ \t]*", $device_definition );
     my $definition_length = int(@definition_arguments);
@@ -162,19 +162,19 @@ sub Define($$) {
     return undef;
 }
 
-sub Undefine($$) {
+sub Undefine() {
 
 }
 
-sub Set($$) {
+sub Set() {
 
 }
 
-sub Get($$) {
+sub Get() {
 
 }
 
-sub Attr(@) {
+sub Attr() {
     my ($command, $device_name, $attribute_name, $attribute_value) = @_;
     my $hash = $::defs{$device_name};
 
@@ -215,7 +215,7 @@ sub Attr(@) {
     }
 }
 
-sub Notify($$) {
+sub Notify() {
 
 }
 
@@ -314,7 +314,7 @@ sub Midnight() {
 
 }
 
-sub CalcCompassPoint($) {
+sub CalcCompassPoint() {
 
     my ($azimuth) = @_;
 
@@ -363,13 +363,13 @@ a list consisting of {Device, Reading} if called in list context
 
 =cut
 
-sub _checkDeviceReading($) {
+sub _checkDeviceReading() {
 
     return unless defined wantarray;
 
     my ($data) = shift;
 
-    return undef unless $data =~ m/(.*):(.*)/;
+    return unless $data =~ m/(.*):(.*)/;
 
     my ($device_name, $reading_name) = ($1, $2);
 
@@ -386,7 +386,7 @@ package main;
 
 FHEM I<DefFn>
 
-=head2 Twilight_Initialize($)
+=head2 Twilight_Initialize()
 
 FHEM I<Initialize> function
 
@@ -398,7 +398,7 @@ FHEM I<Initialize> function
 
 =cut
 
-sub Twilight_Initialize($)
+sub Twilight_Initialize()
 {
     my ($hash) = @_;
 
@@ -437,7 +437,7 @@ Implements a routine to compute the twilight times like sunrise or sunset with m
 =back
 
 =cut
-sub twilight($$$$) {
+sub twilight() {
     my ( $twilight, $reading, $min, $max ) = @_;
 
     my $t = hms2h( ReadingsVal( $twilight, $reading, 0 ) );
