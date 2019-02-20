@@ -335,19 +335,24 @@ sub Twilight_Initialize($)
     ) . " $readingFnAttributes";
 }
 
-=pod
-    twilight()
+=head2 twilight()
 
-    Implements a routine to compute the twilight times like sunrise or sunset with minimal and maximal time values.
+Implements a routine to compute the twilight times like sunrise or sunset with minimal and maximal time values
 
-    Params:
-        $twilight   Name of the twilight device
-        $reading    Name of the reading to read, e.g. ss_astro
-        $min        Minimal time returned
-        $max        Maximal time returned
+=over
 
-    Returns:
+=item Parameter
+
+    $twilight   Name of the twilight device
+    $reading    Name of the reading to read, e.g. ss_astro
+    $min        Minimal time returned
+    $max        Maximal time returned
+
+=item Return value
+
         Time asked for by $reading, formatted HH:MM:SS
+=back
+
 =cut
 sub twilight($$$$) {
     my ( $twilight, $reading, $min, $max ) = @_;
