@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+
+module_file="FHEM/59_Twilight.pm"
+
+commandref_de_source="CommandRef.de.md"
+
+commandref_en_source="CommandRef.en.md"
+
+meta_source="meta.json"
+
+#   +------------------------------------------------------------
+#
+#       Substitute the place holders in the module file with
+#       the converted markdown documentation
+#
+#   +------------------------------------------------------------
+substitute() {
+    echo "" >> .${commandref_de_source}.html
+    pandoc -fmarkdown_github -t html ${commandref_de_source} | \
+        tidy -qi -w --show-body-only yes - >> .${commandref_de_source}.html
+    echo "" >> .${commandref_de_source}.html
+    sed -i -ne "/^=begin html_DE$/ {p; r .${commandref_de_source}.html" -e ":a; n; /^=end html_DE$/ {p; b}; ba}; p" ${module_file}
+
+    echo "" >> .${commandref_en_source}.html
+    pandoc -fmarkdown_github -t html ${commandref_en_source} | \
+        tidy -qi -w --show-body-only yes - >> .${commandref_en_source}.html
+    echo "" >> .${commandref_en_source}.html
+    sed -i -ne "/^=begin html$/ {p; r .${commandref_en_source}.html" -e ":a; n; /^=end html$/ {p; b}; ba}; p" ${module_file}
+
+    sed -i -ne "/^=for :application\/json;q=META.json 59_Twilight.pm$/ {p; r ${meta_source}" -e ":a; n; /^=end :application\/json;q=META.json$/ {p; b}; ba}; p" ${module_file}
+}
+
+add_hooks() {
+    cp -R .git/hooks/* build/hooks/
+}
+
+clean() {
+    rm -rf .CommandRef.*
+}
+
+postprocess() {
+    git add FHEM/*.pm
+    git add CommandRef.*
+    git add meta.json
+    git add build/hooks/
+}
+
+substitute
+add_hooks
+clean
+postprocess
