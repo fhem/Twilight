@@ -64,7 +64,7 @@ update_changed() {
     rm ${changed_file}
     echo "Last Twilight updates ($(date +%d.%m.%Y))" > "${changed_file}"
     echo "" >> ${changed_file}
-    git log HEAD --pretty="  %h %ad %s" --date=format:"%d.%m.%Y %H:%M" FHEM/ |head -5 >> ${changed_file}
+    git log -5 HEAD --pretty="  %h %ad %s" --date=format:"%d.%m.%Y %H:%M" FHEM/  >> ${changed_file}
 
     git add CHANGED
 }
