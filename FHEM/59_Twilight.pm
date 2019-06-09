@@ -64,3 +64,20 @@ sub twilight()
 }
 
 1;
+
+=pod
+=item device
+=item summary       Weather dependend twilight information
+=item summary_DE    Liefert wetterabhängige Informationen über die Lichtverhältnisse
+
+=begin html
+%%CommandRef.en%%
+=end html
+
+=begin html_DE
+%%CommandRef.de%%
+=end html_DE
+
+=for :application/json;q=META.json 59_Twilight.pm
+%%Meta%%
+=end :application/json;q=META.json

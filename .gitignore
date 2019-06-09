@@ -34,3 +34,5 @@ inc/
 /pm_to_blib
 /*.zip
 /59_Twilight.old.pm
+/FHEM/.*
+/.*
