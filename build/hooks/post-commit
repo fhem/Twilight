@@ -71,5 +71,5 @@ update_changed() {
 
 substitute
 add_hooks
-create_controlfile
+test "$(git diff --cached --name-only --diff-filter=ACM | grep -c 'FHEM/')" -gt 0 && create_controlfile
 update_changed
