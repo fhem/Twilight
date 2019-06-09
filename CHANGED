@@ -1,0 +1,7 @@
+Last Twilight updates (09.06.2019)
+
+  73667b3 09.06.2019 16:50 Cleaned templating
+  37e292e 09.06.2019 16:35 Cleaned english CommandRef
+  f9b14c1 09.06.2019 16:32 Added templating for CommandRef and meta.json
+  5a83398 08.06.2019 00:09 Reset 59_Twilight for a new beginning
+  7a2c08d 20.02.2019 13:16 Added checks to Attr()
