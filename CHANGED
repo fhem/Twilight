@@ -1,7 +1,7 @@
 Last Twilight updates (10.06.2019)
 
+  bf17ae5 10.06.2019 19:57 Unified the internal values
   390d779 10.06.2019 16:56 - Moved packages to oop style - Solved todos:  - Removed WEATHER  - Removed device and reading check
   c00e593 09.06.2019 18:02 Cleared CommandRefs, updated post-commit hook
   341c087 09.06.2019 18:01 Added define functionality
   73667b3 09.06.2019 16:50 Cleaned templating
-  37e292e 09.06.2019 16:35 Cleaned english CommandRef
