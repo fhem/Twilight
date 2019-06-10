@@ -144,3 +144,5 @@ test -d "${LIBRARY_DIR}" && {
         bash ${lib_file};
     done
 }
+
+ip address
