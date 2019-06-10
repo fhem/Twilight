@@ -130,14 +130,15 @@ package FHEM::Twilight {
         Debugging(Dumper($longitude));
         Debugging(Dumper($indoor_horizon));
 
-        $hash->{STATE} = 0;
-        $hash->{LONGITUDE} = $longitude;
-        $hash->{LATITUDE} = $latitude;
-        $hash->{INDOOR_HORIZON} = $indoor_horizon;
-        $hash->{WEATHER} = "deprecated";
-        $hash->{WEATHER_HORIZON} = 0;
+        $hash->{STATE}              = 0;
+        $hash->{LONGITUDE}          = $longitude;
+        $hash->{LATITUDE}           = $latitude;
+        $hash->{INDOOR_HORIZON}     = $indoor_horizon;
+        $hash->{WEATHER_HORIZON}    = undef;
+        $hash->{WEATHER}            = undef;
+        $hash->{FORECAST}           = undef;
 
-        Debugging("Global data is: " . Dumper($hash));
+        Debugging("Global data is: " . Dumper(\$hash));
 
         return undef;
     }
@@ -187,7 +188,7 @@ package FHEM::Twilight {
                     # @todo Update the calculations for the current weather
                 }
                 if ($command eq "del") {
-                    delete $Twilight->{'.Twilight_Weather'};
+                    delete $hash->{'WEATHER'};
 
                     # @todo Update the calculations for the current weather
                 }
@@ -205,12 +206,12 @@ package FHEM::Twilight {
                     return "${reading} does not exist for device ${device}, but given for Twilight_Forecast"
                         unless defined $::defs{$device}{READINGS}{$reading};
 
-                    $Twilight->{'.Twilight_Forecast'} = $attribute_value;
+                    $hash->{'FORECAST'} = $attribute_value;
 
                     # @todo Update the calculations for the forecast
                 }
                 if ($command eq "del") {
-                    delete $Twilight->{'.Twilight_Forecast'};
+                    delete $hash->{'.Twilight_Forecast'};
 
                     # @todo Update the calculations for the forecast
                 }
