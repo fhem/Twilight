@@ -32,38 +32,41 @@
 #
 ##############################################################################
 
-# include 95_Astro
-require '95_Astro.pm';
-
-package FHEM::Twilight {
-
+package FHEM::Twilight;
     #
     #   ------------------------------------------------------------ Pragmas
     #
 
     use strict;
-    use v5.10;
+    use v5.18;
     use warnings FATAL => 'all';
+        no warnings 'experimental::smartmatch';
     use feature qw(switch);
     use POSIX;
     use Data::Dumper;
     use English;
-    no if $] >= 5.017011, warnings => 'experimental';
+    use FHEM::Meta;
+
+    #
+    #   ------------------------------------------------------------ Includes
+    #
+    ::LoadModule("Astro");
 
     #
     #   ------------------------------------------------------------ Helper functions
     #
 
-    sub Debugging(@) {
-        $OFS = ", ";
-        ::Debug("@_") if ::AttrVal("global", "verbose", undef) eq "5";
+    sub Debugging {
+        local $OFS = ", ";
+        ::Debug("@_"); # if ::AttrVal("global", "verbose", undef) eq "5";
     }
 
     #
     #   ------------------------------------------------------------ Main functions
     #
 
-    sub Define($$) {
+    sub Define {
+
         my ($hash, $device_definition) = @_;
         my @definition_arguments = split("[ \t][ \t]*", $device_definition);
         my $definition_length = int(@definition_arguments);
@@ -72,7 +75,214 @@ package FHEM::Twilight {
             "syntax: define <name> Twilight [Latitude|global] [Longitude|global] [Indoor Horizon] [deprecated: Yahoo Weather ID]"
             unless ($definition_length ~~ [ 1 .. 6 ]);
 
-        my ($name, $module, $latitude, $longitude, $indoor_horizon, $yahoo_weather) = @definition_arguments[0 .. 5];
+        my ($device_name, $module, $latitude, $longitude, $indoor_horizon, $yahoo_weather) = @definition_arguments[0 .. 5];
+
+        $indoor_horizon = checkIndoorHorizon($indoor_horizon) if $indoor_horizon;
+        $latitude       = checkLatitude($latitude) if $latitude;
+        $longitude      = checkLongitude($longitude) if $longitude;
+
+        ::Log3($device_name, 3,
+            "Setting a Yahoo Weather ID is deprecated and has no further effect. "
+                . "Please consider modifying $device_name.") if $yahoo_weather;
+
+        # move from useExtWeather to Twilight_Weather
+        if (::AttrVal($device_name, 'useExtWeather', undef)) {
+            ::Log3($device_name, 3, "useExtWeather is deprecated, rewritten to Twilight_Weather.");
+            Attr('set', $device_name, 'Twilight_Weather', ::AttrVal($device_name, 'useExtWeather', undef));
+            Attr('del', $device_name, 'useExtWeather');
+        }
+
+        $hash->{LONGITUDE}          = $longitude;
+        $hash->{LATITUDE}           = $latitude;
+
+        # delete old internals, not longer used
+        delete($hash->{INDOOR_HORIZON})     if defined($hash->{INDOOR_HORIZON});
+        delete($hash->{WEATHER_HORIZON})    if defined($hash->{WEATHER_HORIZON});
+        delete($hash->{WEATHER})            if defined($hash->{WEATHER});
+        delete($hash->{FORECAST})           if defined($hash->{FORECAST});
+
+        Debugging("Global data is: " . Dumper(\$hash));
+
+        ::readingsSingleUpdate($hash, 'state', 'Initialized', 1);
+        return undef;
+    }
+
+    sub Undefine {
+
+    }
+
+    sub Set {
+
+    }
+
+    sub Get {
+
+    }
+
+    sub Attr {
+
+        my ($command, $device_name, $attribute_name, $attribute_value) = @_;
+        my $hash = $::defs{$device_name};
+
+        Debugging(
+            "Attr called", "\n",
+            Dumper (
+                $command, $device_name, $attribute_name, $attribute_value
+            )
+        );
+
+        given ($attribute_name) {
+            when ('useExtWeather') {
+                Debugging(
+                    Dumper (
+                        {
+                            'attribute_value' => $attribute_value,
+                            'attr' => 'useExtWeather',
+                            "command" => $command,
+                        }
+                    )
+                );
+
+                # @todo useExtWeather is deprecated, instead Twilight_Weather should be used, but this does not work atm.
+
+                ::Log3($device_name, 3, "useExtWeather is deprecated, use Twilight_Weather instead.");
+                Attr($command, $device_name, 'Twilight_Weather', $attribute_value);
+            }
+
+            when ('Twilight_Weather') {
+                if ($command eq "set") {
+                    my ($device, $reading) = split /:/, $attribute_value;
+
+                    Debugging(
+                        Dumper (
+                            {
+                                'attribute_value' => $attribute_value,
+                                'attr' => 'Twilight_Weather',
+                                "command" => $command,
+                                "device" => $device,
+                                "reading" => $reading,
+                            }
+                        )
+                    );
+
+                    return "Device not given for Twilight_Weather"
+                        unless defined($device);
+
+                    return "Reading not given for Twilight_Weather"
+                        unless defined($reading);
+
+                    return "${device} does not exist, but given for Twilight_Weather"
+                        unless defined($::defs{$device});
+
+                    return "${reading} does not exist for device ${device}, but given for Twilight_Weather"
+                        unless defined($::defs{$device}{READINGS}{$reading});
+
+                    # @todo Update the calculations for the current weather
+                    return undef;
+                }
+
+                if ($command eq "del") {
+                    # @todo Update the calculations for the current weather
+                    return undef;
+                }
+            }
+            when ('Twilight_Forecast') {
+                if ($command eq "set") {
+                    my ($device, $reading) = split /:/, $attribute_value;
+
+                    Debugging(
+                        Dumper(
+                            {
+                                'attribute_value' => $attribute_value,
+                                'attr'            => 'Twilight_Forecast',
+                                "command"         => $command,
+                                "device"          => $device,
+                                "reading"         => $reading,
+                            }
+                        )
+                    );
+
+                    return "Device not given for Twilight_Forecast"
+                        unless defined($device);
+
+                    return "Reading not given for Twilight_Forecast"
+                        unless defined($reading);
+
+                    return "${device} does not exist, but given for Twilight_Forecast"
+                        unless defined $::defs{$device};
+
+                    return "${reading} does not exist for device ${device}, but given for Twilight_Forecast"
+                        unless defined $::defs{$device}{READINGS}{$reading};
+
+                    return undef;
+
+                    # @todo Update the calculations for the forecast
+                }
+
+                if ($command eq "del") {
+                    # @todo Update the calculations for the forecast
+                    return undef;
+                }
+            }
+
+            when('Twilight_Latitude') {
+                # @todo Twilight_Latitude
+
+                if ($command eq 'set') {
+                    # @todo update calculations
+                    my $latitude = checkLatitude($attribute_value);
+                    return undef unless $latitude;
+                }
+
+                if ($command eq 'del') {
+                    # @todo update calculations
+                    return undef;
+                }
+            }
+
+            when('Twilight_Longitude') {
+                # @todo Twilight_Longitude
+
+                if ($command eq 'set') {
+                    # @todo update calculations
+                    my $longitude = checkLongitude($attribute_value);
+                    return undef unless $longitude;
+                }
+
+                if ($command eq 'del') {
+                    # @todo update calculations
+                    return undef;
+                }
+            }
+
+            when('Twilight_Indoor_Horizon') {
+                # @todo Twilight_Indoor_Horizon
+
+                if ($command eq 'set') {
+                    # @todo update calculations
+                    my $indoor_horizon = checkLongitude($attribute_value);
+                    return undef unless $indoor_horizon;
+                }
+
+                if ($command eq 'del') {
+                    # @todo update calculations
+                    return undef;
+                }
+            }
+
+            default {
+                return "Tried to delete unknown attribute $attribute_name." if ($command eq "del");
+                return "Tried to set unknown attribute $attribute_name." if ($command eq "set");
+            }
+        }
+    }
+
+    sub Notify {
+
+    }
+
+    sub checkLatitude {
+        my $latitude = shift;
 
         Debugging("Latitude before check: " . Dumper($latitude));
 
@@ -81,13 +291,19 @@ package FHEM::Twilight {
             $latitude = ::AttrVal("global", "latitude", undef);
         }
 
-        Debugging("Lat after global check: " . Dumper($latitude));
+        Debugging("Latitude after global check: " . Dumper($latitude));
 
-        return "[$name] Latitude is not globally set nor set for $name, you have to set one." unless $latitude;
+        return "Latitude is not globally set nor set, you have to set one." unless $latitude;
 
         unless ($latitude =~ /^[\+-]*[0-9]*\.*[0-9]*$/ && $latitude !~ /^[\. ]*$/) {
-            return "[$name] Latitude '$latitude' seems not to be valid!";
+            return "Latitude '$latitude' seems not to be valid!";
         }
+
+        return $latitude;
+    }
+
+    sub checkLongitude {
+        my $longitude = shift;
 
         Debugging("Longitude before check: " . Dumper($longitude));
 
@@ -98,143 +314,36 @@ package FHEM::Twilight {
 
         Debugging("Longitude after global check: " . Dumper($longitude));
 
-        return "[$name] Longitude is not globally set nor set for $name, you have to set one." unless $longitude;
+        return "Longitude is not globally set nor set, you have to set one." unless $longitude;
 
         unless ($longitude =~ /^[\+-]*[0-9]*\.*[0-9]*$/ && $longitude !~ /^[\. ]*$/) {
-            return "[$name] Longitude '$longitude' seems not to be valid!";
+            return "Longitude '$longitude' seems not to be valid!";
         }
 
-        if ($indoor_horizon) {
-            Debugging("Indoor horzion is set: " . Dumper($indoor_horizon));
-            Debugging("indoor horizon between -6 and 20") if $indoor_horizon ~~ [ -6 .. 20 ];
-            Debugging("indoor horizon not between -6 and 20") unless $indoor_horizon ~~ [ -6 .. 20 ];
-
-            return "[$name] Indoor horizon '$indoor_horizon' is not a valid, must be between -6 and 20"
-                unless ($indoor_horizon ~~ [ -6 .. 20 ]);
-
-            $indoor_horizon = abs int $indoor_horizon;
-        }
-        else {
-            $indoor_horizon = 0;
-        }
-
-        ::Log3($name, 3,
-            "Setting a Yahoo Weather ID is deprecated and has no further effect. "
-                . "Please consider modifying $name.") if $yahoo_weather;
-
-        Debugging($device_definition);
-        Debugging(Dumper(@definition_arguments));
-        Debugging(Dumper($hash));
-        Debugging(Dumper($name));
-        Debugging(Dumper($latitude));
-        Debugging(Dumper($longitude));
-        Debugging(Dumper($indoor_horizon));
-
-        $hash->{STATE}              = 0;
-        $hash->{LONGITUDE}          = $longitude;
-        $hash->{LATITUDE}           = $latitude;
-        $hash->{INDOOR_HORIZON}     = $indoor_horizon;
-        $hash->{WEATHER_HORIZON}    = undef;
-        $hash->{WEATHER}            = undef;
-        $hash->{FORECAST}           = undef;
-
-        Debugging("Global data is: " . Dumper(\$hash));
-
-        return undef;
+        return $longitude;
     }
 
-    sub Undefine() {
+    sub checkIndoorHorizon {
+        my $indoor_horizon = shift;
 
+        Debugging("Indoor horzion is set: " . Dumper($indoor_horizon));
+        Debugging("indoor horizon between -6 and 20") if $indoor_horizon ~~ [ -6 .. 20 ];
+        Debugging("indoor horizon not between -6 and 20") unless $indoor_horizon ~~ [ -6 .. 20 ];
+
+        return "Indoor horizon '$indoor_horizon' is not a valid, must be between -6 and 20"
+            unless ($indoor_horizon ~~ [ -6 .. 20 ]);
+
+        $indoor_horizon = abs int $indoor_horizon;
+
+        return $indoor_horizon;
     }
 
-    sub Set() {
-
-    }
-
-    sub Get() {
-
-    }
-
-    sub Attr() {
-        my ($command, $device_name, $attribute_name, $attribute_value) = @_;
-        my $hash = $::defs{$name};
-
-        given ($attribute_name) {
-            when ('useExtWeather') {
-                if ($command eq "set") {
-                    ::Log3($device_name, 3, "useExtWeather is deprecated, use Twilight_Weather instead.");
-                    Attr($command, $device_name, 'Twilight_Weather', $attribute_value);
-                }
-                if ($command eq "del") {
-                    ::Log3($device_name, 3, "useExtWeather is deprecated, use Twilight_Weather instead.");
-                    Attr($command, $device_name, 'Twilight_Weather');
-                }
-            }
-            when ('Twilight_Weather') {
-                if ($command eq "set") {
-                    my ($device, $reading) = split('/:/', $attribute_value);
-
-                    return "${attribute_value} is no valid value for ${attribute_name}."
-                        unless ($device or $reading);
-
-                    return "${device} does not exist, but given for Twilight_Weather"
-                        unless defined $::defs{$device};
-
-                    return "${reading} does not exist for device ${device}, but given for Twilight_Weather"
-                        unless defined $::defs{$device}{READINGS}{$reading};
-
-                    $hash->{'Twilight_Weather'} = $attribute_value;
-
-                    # @todo Update the calculations for the current weather
-                }
-                if ($command eq "del") {
-                    delete $hash->{'WEATHER'};
-
-                    # @todo Update the calculations for the current weather
-                }
-            }
-            when ('Twilight_Forecast') {
-                if ($command eq "set") {
-                    my ($device, $reading) = split('/:/', $attribute_value);
-
-                    return "${attribute_value} is no valid value for ${attribute_name}."
-                        unless ($device or $reading);
-
-                    return "${device} does not exist, but given for Twilight_Forecast"
-                        unless defined $::defs{$device};
-
-                    return "${reading} does not exist for device ${device}, but given for Twilight_Forecast"
-                        unless defined $::defs{$device}{READINGS}{$reading};
-
-                    $hash->{'FORECAST'} = $attribute_value;
-
-                    # @todo Update the calculations for the forecast
-                }
-                if ($command eq "del") {
-                    delete $hash->{'.Twilight_Forecast'};
-
-                    # @todo Update the calculations for the forecast
-                }
-            }
-            default {
-                return "Tried to delete unknown attribute $attribute_name." if ($command eq "del");
-                return "Tried to set unknown attribute $attribute_name." if ($command eq "set");
-            }
-        }
-    }
-
-    sub Notify() {
-
-    }
-
-}
-
-package main {
+package main;
 
     use strict;
     use warnings;
 
-    sub Twilight_Initialize($)
+    sub Twilight_Initialize
     {
         my ($hash) = @_;
 
@@ -249,16 +358,17 @@ package main {
                 'useExtWeather',        # backward compatibility → Twilight_Weather
                 'Twilight_Weather',
                 'Twilight_Forecast',
+                'Twilight_Indoor_Horizon',
+                'Twilight_Latitude',
+                'Twilight_Longitude',
             )
         ) . " $readingFnAttributes";
     }
 
-    sub twilight()
+    sub twilight
     {
 
     }
-
-}
 
 1;
 
