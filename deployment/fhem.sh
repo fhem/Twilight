@@ -37,9 +37,15 @@ function update_commandref {
     cd $cwd
 }
 
+function add_script {
+    ln -s /vagrant/deployment/reload_fhem.sh /usr/bin/reload-fhem
+    chmod +x /usr/bin/reload-fhem
+}
+
 install_fhem
 install_cfg
 install_twilight
 update_commandref
+add_script
 
 service fhem restart
