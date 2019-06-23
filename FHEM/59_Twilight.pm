@@ -172,7 +172,7 @@ package FHEM::Twilight;
                         unless defined($reading);
 
                     return "${device} does not exist, but given for Twilight_Weather"
-                        unless defined($::defs{$device});
+                        unless ::IsDevice($device);
 
                     return "${reading} does not exist for device ${device}, but given for Twilight_Weather"
                         unless defined($::defs{$device}{READINGS}{$reading});
@@ -209,7 +209,7 @@ package FHEM::Twilight;
                         unless defined($reading);
 
                     return "${device} does not exist, but given for Twilight_Forecast"
-                        unless defined $::defs{$device};
+                        unless ::IsDevice($device);
 
                     return "${reading} does not exist for device ${device}, but given for Twilight_Forecast"
                         unless defined $::defs{$device}{READINGS}{$reading};
