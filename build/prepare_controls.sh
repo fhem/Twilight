@@ -52,6 +52,7 @@ create_controlfile() {
         echo "DEL ${f}" >> ${controls_file}
         out="UPD "$(stat -c %y  $f | cut -d. -f1 | awk '{printf "%s_%s",$1,$2}')" "$(stat -c %s $f)" ${f}"
         echo ${out//.\//} >> ${controls_file}
+        echo "Generated data: $out"
     done
 
     git add ${controls_file}
