@@ -35,4 +35,4 @@ inc/
 /*.zip
 /59_Twilight.old.pm
 /FHEM/.*
-/.*
+/.git
