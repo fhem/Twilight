@@ -1,2 +1,0 @@
-DEL ./FHEM/59_Twilight.pm
-UPD 2019-06-10_16:54:02 11320 FHEM/59_Twilight.pm
