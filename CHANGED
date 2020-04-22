@@ -1,3 +1,3 @@
-2020-04-22 - Fixed an error in the sed command again
+2020-04-22 - Added remark regarding exclude_from_update to the README
 Last Buienradar updates (22.04.2020)
-  deb5dcc 22.04.2020 10:29 Fixed an error in the sed command again
+  8635ff7 22.04.2020 10:37 Added remark regarding exclude_from_update to the README
