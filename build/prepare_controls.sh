@@ -37,7 +37,7 @@ substitute() {
     sed -i -ne "/^=begin html$/ {p; r .${commandref_en_source}.html" -e ":a; n; /^=end html$/ {p; b}; ba}; p" ${module_file}
 
     # insert meta data
-    sed -i -ne "/^=for :application\/json;q=META.json $module_file$/ {p; r ${meta_source}" -e ":a; n; /^=end :application\/json;q=META.json$/ {p; b}; ba}; p" ${module_file}
+    sed -i -ne "/^=for :application\/json;q=META.json ${module_file}$/ {p; r ${meta_source}" -e ":a; n; /^=end :application\/json;q=META.json$/ {p; b}; ba}; p" ${module_file}
 
     # add created files
     git add FHEM/*.pm
