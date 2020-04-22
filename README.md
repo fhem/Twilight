@@ -6,6 +6,13 @@
 ## License
 This software is published under the [GNU General Public License 2.0](http://www.gnu.org/licenses/old-licenses/gpl-2.0.html).
 
+## This version vs. the SVN version
+If you install a vanilla FHEM, you will be provided with an older Twilight version. If you want to use this much more newer version, you need to exclude the old one from `update`. To do so, you need to set the `exclude_from_update` (also) to fhem.de's `FHEM/59_Twilight.pm`, i.e. by
+
+        attr global exclude_from_update fhem.de.*:FHEM/59_Twilight.pm   
+
+Then you have to add this repository to your FHEM installation and `update` it.
+
 ## Branching model
 * `stable` contains the current version as delivered by `fhem update` from the [official FHEM Repository](https://svn.fhem.de/trac/browser/trunk/fhem/FHEM/59_Twilight.pm).
 * ``oldstable`` contains the previous release version, just for stability issues. Issues for ``oldstable`` are not ``accepted``.
