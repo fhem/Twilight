@@ -9,7 +9,7 @@ jobs:
       CONTROLS_CREATE_SCRIPT: build/prepare_controls.sh
     runs-on: ubuntu-latest
     steps:
-      - name Update Environment
+      - name: Update Environment
         run: sudo apt-get install -y pandoc tidy
       - name: Extract branch name
         run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
