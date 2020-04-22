@@ -36,3 +36,4 @@ inc/
 /59_Twilight.old.pm
 /FHEM/.*
 /.git
+.gitignore

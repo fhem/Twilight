@@ -379,13 +379,13 @@ package main;
 
 =begin html
 
-<h1 id="twilight">Twilight</h1>
+<h1>Twilight</h1>
 
 =end html
 
 =begin html_DE
 
-<h1 id="twilight">Twilight</h1>
+<h1>Twilight</h1>
 
 =end html_DE
 
